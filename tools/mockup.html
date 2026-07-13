@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Bike Ad — Mockup Studio (internal)</title>
+<style>
+  :root {
+    --bg: #0a0a0a; --panel: #141312; --line: rgba(255,255,255,0.09);
+    --orange: #ff4f1f; --text: #f5f1ec; --muted: #a39c93;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 15px/1.5 -apple-system, "Helvetica Neue", sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+  header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 22px; border-bottom: 1px solid var(--line);
+  }
+  header .mark { color: var(--orange); font-weight: 800; font-size: 1.1rem; letter-spacing: 0.02em; }
+  header .tag { color: var(--muted); font-size: 0.8rem; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; }
+  main { display: flex; gap: 20px; padding: 20px; flex: 1; align-items: flex-start; flex-wrap: wrap; }
+  .controls { width: 300px; display: flex; flex-direction: column; gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .card h3 { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); margin-bottom: 10px; }
+  .drop {
+    border: 1.5px dashed rgba(255,79,31,0.5); border-radius: 10px;
+    padding: 22px 14px; text-align: center; color: var(--muted); cursor: pointer;
+    transition: background 0.2s, border-color 0.2s; font-size: 0.9rem;
+  }
+  .drop.armed, .drop:hover { background: rgba(255,79,31,0.07); border-color: var(--orange); }
+  .drop strong { color: var(--orange); }
+  .drop .loaded { color: var(--text); font-weight: 600; word-break: break-all; }
+  input[type=file] { display: none; }
+  input[type=text] {
+    width: 100%; background: #0a0805; border: 1.5px solid var(--line); border-radius: 8px;
+    color: var(--text); padding: 9px 12px; font-size: 0.95rem; outline: none;
+  }
+  input[type=text]:focus { border-color: var(--orange); }
+  input[type=range] { width: 100%; accent-color: var(--orange); }
+  .row { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+  .row b { color: var(--text); }
+  button {
+    font: inherit; font-weight: 700; cursor: pointer; border: none; border-radius: 999px;
+    padding: 11px 18px; width: 100%; margin-top: 8px;
+    transition: transform 0.15s, opacity 0.15s;
+  }
+  button:disabled { opacity: 0.4; cursor: default; }
+  button:not(:disabled):hover { transform: translateY(-1px); }
+  .solid { background: var(--orange); color: #140500; }
+  .ghost { background: none; border: 1.5px solid rgba(255,79,31,0.5); color: var(--orange); }
+  .status { font-size: 0.82rem; color: var(--muted); min-height: 1.3em; margin-top: 8px; word-break: break-word; }
+  .status.err { color: #ff7a68; }
+  .spec { font-size: 0.8rem; color: var(--muted); line-height: 1.55; }
+  .spec b { color: var(--text); }
+  .stage { flex: 1; min-width: 340px; max-width: 900px; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .tab {
+    width: auto; margin: 0; padding: 7px 16px; font-size: 0.85rem;
+    background: var(--panel); color: var(--muted); border: 1px solid var(--line);
+  }
+  .tab.on { background: var(--orange); color: #140500; border-color: var(--orange); }
+  #view { width: 100%; aspect-ratio: 1; background: #000; border-radius: 16px; border: 1px solid var(--line); display: block; }
+  .hint { color: var(--muted); font-size: 0.75rem; margin-top: 10px; text-align: center; }
+  .viewwrap { position: relative; }
+  #overlay { position: absolute; inset: 0; pointer-events: none; }
+  .handle {
+    position: absolute; width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(255,79,31,0.22); border: 2.5px solid var(--orange);
+    transform: translate(-50%, -50%); pointer-events: auto; cursor: grab;
+    touch-action: none;
+  }
+  .handle:active { cursor: grabbing; background: var(--orange); }
+  #loupe {
+    position: fixed; width: 150px; height: 150px; border-radius: 50%;
+    border: 2.5px solid var(--orange); overflow: hidden; display: none;
+    pointer-events: none; z-index: 90; box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+    background: #000;
+  }
+  #loupe canvas { width: 150px; height: 150px; }
+  #loupe::after {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 12px; height: 12px;
+    transform: translate(-50%, -50%); border: 1.5px solid #fff; border-radius: 50%;
+    mix-blend-mode: difference;
+  }
+  #vctl { display: none; align-items: center; gap: 10px; margin-top: 12px; }
+  #vctl.on { display: flex; }
+  .seekwrap { flex: 1; position: relative; display: flex; }
+  .seekwrap input[type=range] { width: 100%; }
+  #vmarks { position: absolute; left: 0; right: 0; bottom: -7px; height: 6px; pointer-events: none; }
+  #vmarks i {
+    position: absolute; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--orange); transform: translateX(-50%);
+  }
+  #vctl .tab { flex-shrink: 0; }
+  #vpanels { display: none; gap: 8px; margin-top: 10px; align-items: center; flex-wrap: wrap; }
+  #vpanels.on { display: flex; }
+  #vpanels .pn { color: var(--muted); font-size: 0.8rem; }
+  #calBox {
+    position: fixed; inset: auto 20px 20px 20px; z-index: 50; display: none;
+    background: #1a1000; border: 1.5px solid var(--orange); border-radius: 12px; padding: 14px 18px;
+    font-size: 0.9rem;
+  }
+  #calBox.on { display: block; }
+  #calBox b { color: var(--orange); }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="mark">BIKE AD</span>
+  <span class="tag">mockup studio — internal, do not publish</span>
+</header>
+
+<main>
+  <div class="controls">
+    <div class="card">
+      <h3>Client ad</h3>
+      <label class="drop" id="drop">
+        <span id="dropLabel">Drop the ad here<br><strong>video or image</strong> — or click to browse</span>
+        <input type="file" id="file" accept="video/*,image/*">
+      </label>
+    </div>
+
+    <div class="card">
+      <h3>Client</h3>
+      <input type="text" id="client" placeholder="Client name (for the files + PDF)" maxlength="40">
+    </div>
+
+    <div class="card">
+      <h3>Montage</h3>
+      <div class="row"><span>Seconds per angle</span><b id="secLabel">4s</b></div>
+      <input type="range" id="sec" min="2" max="8" step="0.5" value="4">
+      <button class="solid" id="recBtn" disabled>Export video</button>
+      <button class="ghost" id="pdfBtn" disabled>Export PDF</button>
+      <div class="status" id="status">Load an ad to enable exports.</div>
+    </div>
+
+    <div class="card spec">
+      <b>Real screen spec</b> — P2.604 · each face 500×500&nbsp;mm ·
+      <b>192×192 px, square</b> (3 sides, one ad mirrored on all).
+      Ask clients for <b>square artwork, 192×192 or larger</b>.
+      The preview shows the true LED pixel grid.
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="tabs" id="tabs"></div>
+    <div class="viewwrap">
+      <canvas id="view" width="1080" height="1080"></canvas>
+      <div id="overlay"></div>
+    </div>
+    <div id="vctl">
+      <button class="tab" id="vplay">⏸</button>
+      <span class="seekwrap"><input type="range" id="vseek" min="0" max="100" step="0.1" value="0"><span id="vmarks"></span></span>
+      <button class="tab" id="vfix">Save fix here</button>
+      <button class="tab" id="vclear">Clear fixes (<span id="vfixn">0</span>)</button>
+    </div>
+    <div id="vpanels">
+      <button class="tab" id="vprev">⟨ prev</button>
+      <span class="pn" id="vslide"></span>
+      <button class="tab" id="vnext">next ⟩</button>
+      <button class="tab" id="vsplit">Split panel in two</button>
+      <button class="tab" id="vadd">Add panel</button>
+      <button class="tab" id="vdel">Remove panel</button>
+      <span class="pn" id="vpn"></span>
+    </div>
+    <div class="hint">montage tab auto-plays · press <b>C</b> on a scene tab to fine-tune panel corners · <b>R</b> resets tuning<br>
+    on the video tab: pause anywhere and drag the orange dots to correct the ad's corners, then “Save fix here”<br>
+    slide-by-slide: <b>⟨ prev / next ⟩</b> (or ← → keys) steps the clip in half-second slides — saving a fix auto-advances to the next slide</div>
+  </div>
+</main>
+
+<div id="loupe"><canvas width="150" height="150"></canvas></div>
+<div id="calBox"></div>
+
+<script>
+"use strict";
+/* ═════════ scenes: baked panel quads (image px, TL TR BR BL) ═════════
+   If a scene image contains flat chroma-green panels (future renders),
+   they are auto-detected and override these. localStorage overrides both. */
+/* green-screen stills (frames of the orbit segments, so they match the
+   clip's bike exactly) — panels are auto-detected from the green */
+const SCENES = [
+  { id: "right", label: "Right", src: "scenes/right.jpg", panels: [] },
+  { id: "back",  label: "Back",  src: "scenes/back.jpg",  panels: [] },
+  { id: "left",  label: "Left",  src: "scenes/left.jpg",  panels: [] },
+];
+const LED = 192;           // real panel resolution per face (square)
+const FADE = 0.4;          // montage crossfade seconds
+const LS_KEY = "bikead-mockup-quads-v2";
+
+const view = document.getElementById("view");
+const gl = view.getContext("webgl", { preserveDrawingBuffer: true, antialias: true });
+const W = view.width, H = view.height;
+
+/* ═════════ tiny GL helpers ═════════ */
+function sh(type, src) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+function prog(vs, fs) {
+  const p = gl.createProgram();
+  gl.attachShader(p, sh(gl.VERTEX_SHADER, vs));
+  gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+  return p;
+}
+function tex(filter) {
+  const t = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
+  return t;
+}
+
+/* base image program */
+const pBase = prog(`
+  attribute vec2 aPos;
+  varying vec2 vClip;
+  void main(){ vClip = aPos; gl_Position = vec4(aPos, 0.0, 1.0); }`, `
+  precision mediump float;
+  varying vec2 vClip;
+  uniform sampler2D uImg;
+  uniform vec4 uMap;   /* u = vClip.x*uMap.x + uMap.y ; v = vClip.y*uMap.z + uMap.w */
+  uniform float uAlpha;
+  void main(){
+    vec2 uv = vec2(vClip.x * uMap.x + uMap.y, vClip.y * uMap.z + uMap.w);
+    vec4 c = texture2D(uImg, uv);
+    gl_FragColor = vec4(c.rgb, uAlpha);
+  }`);
+
+/* ad panel program: projective mapping + true LED grid + optional chroma mask */
+const pAd = prog(`
+  attribute vec2 aPos;
+  attribute vec3 aQ;
+  varying vec3 vQ;
+  varying vec2 vClip;
+  void main(){ vQ = aQ; vClip = aPos; gl_Position = vec4(aPos, 0.0, 1.0); }`, `
+  precision mediump float;
+  varying vec3 vQ;
+  varying vec2 vClip;
+  uniform sampler2D uAd, uImg;
+  uniform vec4 uMap;
+  uniform float uAlpha, uKey, uGrid;
+  void main(){
+    vec2 uv = vQ.xy / vQ.z;
+    if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) discard;
+    vec4 ad = texture2D(uAd, uv);
+    /* true LED grid, calibrated against footage of the real P2.604
+       box: at viewing distance it reads smooth and backlit — the
+       grid is only a faint texture, not a dot pattern */
+    vec2 cell = fract(uv * uGrid) - 0.5;
+    float dotm = smoothstep(0.9, 0.35, length(cell) * 2.0);
+    ad.rgb *= mix(0.90, 1.06, dotm);
+    /* thin edge falloff only — the real panel glows to its edges */
+    vec2 e = min(uv, 1.0 - uv);
+    float vig = smoothstep(0.0, 0.018, e.x) * smoothstep(0.0, 0.018, e.y);
+    ad.rgb *= mix(0.8, 1.0, vig);
+    /* backlit lift + led saturation pop (real panel look) */
+    ad.rgb = pow(ad.rgb, vec3(0.92)) * 1.16;
+    float lum = dot(ad.rgb, vec3(0.299, 0.587, 0.114));
+    ad.rgb = mix(vec3(lum), ad.rgb, 1.08);
+    float a = uAlpha;
+    if (uKey > 0.5) {
+      vec2 buv = vec2(vClip.x * uMap.x + uMap.y, vClip.y * uMap.z + uMap.w);
+      vec3 b = texture2D(uImg, buv).rgb;
+      a *= smoothstep(0.045, 0.13, b.g - max(b.r, b.b));
+    }
+    gl_FragColor = vec4(ad.rgb, a);
+  }`);
+
+const quadBuf = gl.createBuffer();
+gl.enable(gl.BLEND);
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+gl.clearColor(0, 0, 0, 1);
+
+/* ═════════ led buffer: the ad rendered at the REAL panel resolution ═════════ */
+const led = document.createElement("canvas");
+led.width = LED; led.height = LED;
+const lctx = led.getContext("2d");
+const ledTex = tex(gl.NEAREST);
+let ad = null, adIsVideo = false, adReady = false;
+
+function drawLed() {
+  if (!adReady) return;
+  const w = adIsVideo ? ad.videoWidth : ad.naturalWidth;
+  const h = adIsVideo ? ad.videoHeight : ad.naturalHeight;
+  if (!w || !h) return;
+  const s = Math.max(LED / w, LED / h);      /* cover-crop into the square face */
+  lctx.fillStyle = "#000";
+  lctx.fillRect(0, 0, LED, LED);
+  lctx.drawImage(ad, (LED - w * s) / 2, (LED - h * s) / 2, w * s, h * s);
+  gl.bindTexture(gl.TEXTURE_2D, ledTex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, led);
+}
+
+/* ═════════ scene loading + green auto-detect ═════════ */
+const overrides = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
+
+let loadedScenes = 0;
+SCENES.forEach(s => {
+  s.img = new Image();
+  s.img.onload = () => {
+    s.tex = tex(gl.LINEAR);
+    gl.bindTexture(gl.TEXTURE_2D, s.tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, s.img);
+    s.iw = s.img.naturalWidth; s.ih = s.img.naturalHeight;
+    const green = detectPanels(s.img, s.iw, s.ih);
+    if (green.length) {
+      s.keyed = true;
+      s.panels = green.map((q, i) => ({ name: "panel" + (i + 1), quad: q }));
+    }
+    if (overrides[s.id]) {
+      overrides[s.id].forEach((q, i) => { if (s.panels[i]) s.panels[i].quad = q; });
+    }
+    loadedScenes++;
+    render();
+  };
+  s.img.src = s.src;
+});
+
+/* ═════════ geometry ═════════ */
+function coverMap(s) {
+  const sc = Math.max(W / s.iw, H / s.ih);
+  const ox = (W - s.iw * sc) / 2, oy = (H - s.ih * sc) / 2;
+  return { sc, ox, oy };
+}
+function imgToClip(s, p, m) {
+  const x = (p[0] * m.sc + m.ox) / W * 2 - 1;
+  const y = 1 - (p[1] * m.sc + m.oy) / H * 2;
+  return [x, y];
+}
+/* uMap so that fragment uv = clip*scale+off samples the cover-fitted image */
+function baseMap(s, m) {
+  return [ W / (2 * s.iw * m.sc), (W / 2 - m.ox) / (s.iw * m.sc),
+          -H / (2 * s.ih * m.sc), (H / 2 - m.oy) / (s.ih * m.sc) ];
+}
+function lineHit(p1, p2, p3, p4) {
+  const d = (p1[0]-p2[0])*(p3[1]-p4[1]) - (p1[1]-p2[1])*(p3[0]-p4[0]);
+  if (Math.abs(d) < 1e-6) return null;
+  const t = ((p1[0]-p3[0])*(p3[1]-p4[1]) - (p1[1]-p3[1])*(p3[0]-p4[0])) / d;
+  return [p1[0] + t*(p2[0]-p1[0]), p1[1] + t*(p2[1]-p1[1])];
+}
+function projQ(quad) {
+  const o = lineHit(quad[0], quad[2], quad[1], quad[3]);
+  const q = [1, 1, 1, 1];
+  if (o) {
+    const d = quad.map(p => Math.hypot(p[0]-o[0], p[1]-o[1]));
+    q[0] = (d[0] + d[2]) / d[2]; q[1] = (d[1] + d[3]) / d[3];
+    q[2] = (d[2] + d[0]) / d[0]; q[3] = (d[3] + d[1]) / d[1];
+  }
+  return q;
+}
+
+/* ═════════ drawing ═════════ */
+function drawScene(s, alpha) {
+  if (!s.tex) return;
+  const m = coverMap(s), bm = baseMap(s, m);
+  /* base */
+  gl.useProgram(pBase);
+  gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.DYNAMIC_DRAW);
+  const aPos = gl.getAttribLocation(pBase, "aPos");
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, s.tex);
+  gl.uniform1i(gl.getUniformLocation(pBase, "uImg"), 0);
+  gl.uniform4fv(gl.getUniformLocation(pBase, "uMap"), bm);
+  gl.uniform1f(gl.getUniformLocation(pBase, "uAlpha"), alpha);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+  if (!adReady) return;
+  /* panels */
+  gl.useProgram(pAd);
+  s.panels.forEach(panel => {
+    const q = projQ(panel.quad);
+    const uv = [[0,0],[1,0],[1,1],[0,1]];
+    const verts = [];
+    [0, 1, 3, 2].forEach(i => {           /* strip order TL TR BL BR */
+      const c = imgToClip(s, panel.quad[i], m);
+      verts.push(c[0], c[1], uv[i][0]*q[i], uv[i][1]*q[i], q[i]);
+    });
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verts), gl.DYNAMIC_DRAW);
+    const ap = gl.getAttribLocation(pAd, "aPos");
+    const aq = gl.getAttribLocation(pAd, "aQ");
+    gl.enableVertexAttribArray(ap);
+    gl.vertexAttribPointer(ap, 2, gl.FLOAT, false, 20, 0);
+    gl.enableVertexAttribArray(aq);
+    gl.vertexAttribPointer(aq, 3, gl.FLOAT, false, 20, 8);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, ledTex);
+    gl.uniform1i(gl.getUniformLocation(pAd, "uAd"), 0);
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, s.tex);
+    gl.uniform1i(gl.getUniformLocation(pAd, "uImg"), 1);
+    gl.uniform4fv(gl.getUniformLocation(pAd, "uMap"), bm);
+    gl.uniform1f(gl.getUniformLocation(pAd, "uAlpha"), alpha);
+    gl.uniform1f(gl.getUniformLocation(pAd, "uKey"), s.keyed ? 1 : 0);
+    gl.uniform1f(gl.getUniformLocation(pAd, "uGrid"), LED);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  });
+}
+
+/* ═════════ montage timeline + render loop ═════════ */
+let mode = "montage";                       /* scene id or "montage" */
+let t0 = performance.now();
+const secInput = document.getElementById("sec");
+const secPer = () => parseFloat(secInput.value);
+
+function montageState(now) {
+  const per = secPer(), total = per * SCENES.length;
+  const t = ((now - t0) / 1000) % total;
+  const i = Math.floor(t / per);
+  const local = t - i * per;
+  const fadeIn = i === 0 && t < FADE && (now - t0) / 1000 < total ? 1 : 1; /* no lead-in fade */
+  if (local > per - FADE) {
+    return { a: i, b: (i + 1) % SCENES.length, mix: (local - (per - FADE)) / FADE };
+  }
+  return { a: i, b: null, mix: 0 };
+}
+
+function render() {
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  drawLed();
+  if (mode === "montage") {
+    const st = montageState(performance.now());
+    drawScene(SCENES[st.a], 1);
+    if (st.b !== null) drawScene(SCENES[st.b], st.mix);
+  } else if (mode === "video" && vscene.ready) {
+    const v = vscene.video;
+    gl.bindTexture(gl.TEXTURE_2D, vscene.tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, v);
+    if (!v.paused) {
+      if (frameN % 2 === 0 || !vscene.quads.length) { detectQuads(); applyFixes(v.currentTime); }
+    } else if (!vscene.edited && (vscene.seekDirty || frameN % 15 === 0)) {
+      /* paused + untouched: keep re-detecting (seek frames can land late) */
+      detectQuads(); applyFixes(v.currentTime); vscene.seekDirty = false;
+    }
+    drawScene({ tex: vscene.tex, iw: vscene.iw, ih: vscene.ih, keyed: true,
+                panels: vscene.quads.map(q => ({ quad: q })) }, 1);
+  } else {
+    const s = SCENES.find(x => x.id === mode);
+    if (s) drawScene(s, 1);
+  }
+}
+let frameN = 0;
+(function loop() {
+  render();
+  /* if the browser paused the ad video (autoplay policy, tab switch…), nudge it back */
+  if (++frameN % 30 === 0 && adIsVideo && adReady && ad && ad.paused) ad.play().catch(() => {});
+  if (mode === "video" && vscene.ready) {
+    const v = vscene.video;
+    if (!vSeekDrag && v.duration) vseek.value = v.currentTime / v.duration * 100;
+    vplay.textContent = v.paused ? "▶" : "⏸";
+    updateHandles();
+    const vp = document.getElementById("vpanels");
+    vp.className = v.paused ? "on" : "";
+    if (v.paused) {
+      document.getElementById("vpn").textContent = "panels: " + vscene.quads.length;
+      document.getElementById("vslide").textContent = "slide " + (curSlide() + 1) + "/" + slideCount();
+    }
+  } else {
+    const o = document.getElementById("overlay");
+    if (o && o.childNodes.length) o.innerHTML = "";
+    const vp = document.getElementById("vpanels");
+    if (vp && vp.className) vp.className = "";
+  }
+  requestAnimationFrame(loop);
+})();
+/* any user gesture also resumes playback (covers strict autoplay policies) */
+addEventListener("pointerdown", () => { if (adIsVideo && adReady && ad && ad.paused) ad.play().catch(() => {}); });
+
+/* ═════════ ui: tabs ═════════ */
+const vscene = { ready: false, quads: [], fixes: [], edited: false, seekDirty: false };
+const tabsEl = document.getElementById("tabs");
+function makeTabs() {
+  tabsEl.innerHTML = "";
+  const all = [...SCENES.map(s => ({ id: s.id, label: s.label }))];
+  if (vscene.ready) all.push({ id: "video", label: "▶ Orbit clip" });
+  all.push({ id: "montage", label: "▶ Montage" });
+  all.forEach(t => {
+    const b = document.createElement("button");
+    b.className = "tab" + (mode === t.id ? " on" : "");
+    b.textContent = t.label;
+    b.onclick = () => { mode = t.id; t0 = performance.now(); makeTabs(); };
+    tabsEl.appendChild(b);
+  });
+  document.getElementById("vctl").className = (mode === "video" && vscene.ready) ? "on" : "";
+}
+makeTabs();
+document.getElementById("secLabel").textContent = secPer() + "s";
+secInput.oninput = () => document.getElementById("secLabel").textContent = secPer() + "s";
+
+/* ═════════ ad input ═════════ */
+const drop = document.getElementById("drop");
+const fileIn = document.getElementById("file");
+const status = (msg, err) => {
+  const el = document.getElementById("status");
+  el.textContent = msg; el.className = "status" + (err ? " err" : "");
+};
+function loadAd(file) {
+  const url = URL.createObjectURL(file);
+  loadAdFromUrl(url, file.type.startsWith("video"), file.name);
+}
+function loadAdFromUrl(url, isVideo, name) {
+  adReady = false;
+  if (ad && adIsVideo) { ad.pause(); ad.remove(); }
+  if (isVideo) {
+    ad = document.createElement("video");
+    ad.muted = true; ad.loop = true; ad.playsInline = true;
+    ad.setAttribute("playsinline", ""); ad.setAttribute("webkit-playsinline", "");
+    ad.crossOrigin = "anonymous";
+    /* keep it in the document (hidden) — detached videos stall in some browsers */
+    ad.style.cssText = "position:fixed;width:2px;height:2px;opacity:0;pointer-events:none;bottom:0;left:0;";
+    document.body.appendChild(ad);
+    let armed = false;
+    const arm = () => {
+      if (armed) return;
+      armed = true; adReady = true;
+      ad.play().catch(() => {});
+      armExports(name);
+    };
+    ad.oncanplay = arm;
+    ad.onloadeddata = arm;
+    ad.onerror = () => status("Couldn't decode that video — try an MP4 (H.264). MOV/HEVC files often can't play in the browser.", true);
+    ad.src = url;
+    ad.load();
+  } else {
+    ad = new Image();
+    ad.crossOrigin = "anonymous";
+    ad.onload = () => { adReady = true; armExports(name); };
+    ad.onerror = () => status("Couldn't read that image.", true);
+    ad.src = url;
+  }
+  adIsVideo = isVideo;
+}
+function armExports(name) {
+  document.getElementById("recBtn").disabled = false;
+  document.getElementById("pdfBtn").disabled = false;
+  document.getElementById("dropLabel").innerHTML = '<span class="loaded">' + (name || "ad loaded") + "</span><br>drop another to replace";
+  status("Ad on the panels — " + LED + "×" + LED + " true LED grid.");
+}
+/* the label opens the picker natively — no manual click() (it recurses) */
+fileIn.onchange = () => fileIn.files[0] && loadAd(fileIn.files[0]);
+/* accept drops anywhere on the page; never let the browser navigate to the file */
+["dragover", "dragleave", "drop"].forEach(ev => window.addEventListener(ev, e => {
+  e.preventDefault();
+  drop.classList.toggle("armed", ev === "dragover");
+  if (ev === "drop" && e.dataTransfer.files[0]) loadAd(e.dataTransfer.files[0]);
+}));
+
+/* ═════════ export: video ═════════ */
+const recBtn = document.getElementById("recBtn");
+function bestMime() {
+  const c = ["video/mp4;codecs=avc1", "video/mp4", "video/webm;codecs=vp9", "video/webm"];
+  return c.find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || "";
+}
+let recording = false;
+recBtn.onclick = () => {
+  if (recording) return;
+  recording = true;
+  let total;
+  if (mode === "video" && vscene.ready) {
+    /* record exactly one pass of the clip, ad synced from its start */
+    const v = vscene.video;
+    v.currentTime = 0; vscene.edited = false;
+    if (adIsVideo && ad) { try { ad.currentTime = 0; } catch (e) {} }
+    v.play().catch(() => {});
+    total = Math.max(1, v.duration - 0.15);
+  } else {
+    mode = "montage"; t0 = performance.now(); makeTabs();
+    total = secPer() * SCENES.length;
+  }
+  const mime = bestMime();
+  const stream = view.captureStream(30);
+  const rec = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 6_000_000 } : undefined);
+  const chunks = [];
+  rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+  rec.onstop = () => {
+    recording = false;
+    recBtn.disabled = false; recBtn.textContent = "Export video";
+    const blob = new Blob(chunks, { type: rec.mimeType });
+    const ext = rec.mimeType.includes("mp4") ? "mp4" : "webm";
+    const name = "bikead-mockup-" + slug() + "." + ext;
+    save(blob, name);
+    status("Saved " + name + " (" + (blob.size / 1e6).toFixed(1) + " MB, " + total + "s)");
+    window.__mock.lastVideo = { size: blob.size, type: rec.mimeType };
+  };
+  rec.start(200);
+  recBtn.disabled = true;
+  let left = total;
+  status("Recording " + total.toFixed(1) + "s…");
+  const iv = setInterval(() => {
+    left -= 0.5;
+    recBtn.textContent = "Recording… " + Math.max(0, left).toFixed(1) + "s";
+    if (left <= 0) { clearInterval(iv); rec.stop(); }
+  }, 500);
+};
+function slug() {
+  return (document.getElementById("client").value.trim() || "client")
+    .toLowerCase().replace(/[^a-z0-9؀-ۿ]+/g, "-").replace(/^-|-$/g, "");
+}
+function save(blob, name) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+}
+
+/* ═════════ export: pdf ═════════ */
+const pdfBtn = document.getElementById("pdfBtn");
+pdfBtn.onclick = async () => {
+  status("Preparing PDF…");
+  const stills = SCENES.map(s => {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    drawLed();
+    drawScene(s, 1);
+    return { label: s.label, data: view.toDataURL("image/jpeg", 0.92) };
+  });
+  render();
+  try {
+    if (!window.jspdf) {
+      await new Promise((res, rej) => {
+        const sc = document.createElement("script");
+        sc.src = "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js";
+        sc.onload = res; sc.onerror = rej;
+        document.head.appendChild(sc);
+      });
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+    const pw = doc.internal.pageSize.getWidth(), ph = doc.internal.pageSize.getHeight();
+    const client = document.getElementById("client").value.trim() || "Your brand";
+    /* cover */
+    doc.setFillColor(5, 5, 5); doc.rect(0, 0, pw, ph, "F");
+    doc.setTextColor(255, 79, 31); doc.setFont("helvetica", "bold"); doc.setFontSize(42);
+    doc.text("BIKE AD", pw / 2, ph / 2 - 40, { align: "center" });
+    doc.setTextColor(245, 241, 236); doc.setFontSize(20);
+    doc.text("Ad mockup — " + client, pw / 2, ph / 2 + 4, { align: "center" });
+    doc.setTextColor(163, 156, 147); doc.setFontSize(11);
+    doc.text(new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }), pw / 2, ph / 2 + 28, { align: "center" });
+    doc.text("Triple-sided LED panels · 3,600,000 monthly impressions", pw / 2, ph - 40, { align: "center" });
+    /* one page per angle */
+    stills.forEach(st => {
+      doc.addPage("a4", "landscape");
+      doc.setFillColor(5, 5, 5); doc.rect(0, 0, pw, ph, "F");
+      const size = ph - 110;
+      doc.addImage(st.data, "JPEG", (pw - size) / 2, 40, size, size);
+      doc.setTextColor(163, 156, 147); doc.setFontSize(11);
+      doc.text(st.label + " view — " + client, pw / 2, ph - 34, { align: "center" });
+      doc.setTextColor(255, 79, 31);
+      doc.text("wa.me/201154009439", pw / 2, ph - 18, { align: "center" });
+    });
+    const name = "bikead-mockup-" + slug() + ".pdf";
+    doc.save(name);
+    status("Saved " + name);
+    window.__mock.lastPdf = true;
+  } catch (e) {
+    /* offline fallback: plain stills */
+    stills.forEach(st => {
+      fetch(st.data).then(r => r.blob()).then(b => save(b, "bikead-mockup-" + slug() + "-" + st.label.toLowerCase() + ".jpg"));
+    });
+    status("PDF library unreachable — saved the stills as images instead.", true);
+  }
+};
+
+/* ═════════ calibration (C to start on a scene tab, R resets) ═════════ */
+const calBox = document.getElementById("calBox");
+let cal = null;    /* { sceneId, panel, corner } */
+const CORNERS = ["top-left", "top-right", "bottom-right", "bottom-left"];
+addEventListener("keydown", e => {
+  if (e.key === "c" || e.key === "C") {
+    if (mode === "montage") { status("Pick a scene tab first, then press C.", true); return; }
+    cal = { sceneId: mode, panel: 0, corner: 0 };
+    calPrompt();
+  }
+  if (e.key === "r" || e.key === "R") {
+    localStorage.removeItem(LS_KEY);
+    status("Panel tuning reset — reload to restore baked positions.");
+  }
+  if (e.key === "Escape" && cal) { cal = null; calBox.className = ""; }
+});
+function calPrompt() {
+  const s = SCENES.find(x => x.id === cal.sceneId);
+  calBox.className = "on";
+  calBox.innerHTML = "Calibrating <b>" + s.label + "</b> — panel " + (cal.panel + 1) + "/" + s.panels.length +
+    ": click the <b>" + CORNERS[cal.corner] + "</b> corner of the screen · Esc to cancel";
+}
+view.addEventListener("click", e => {
+  if (!cal) return;
+  const s = SCENES.find(x => x.id === cal.sceneId);
+  const r = view.getBoundingClientRect();
+  const cx = (e.clientX - r.left) / r.width * W;
+  const cy = (e.clientY - r.top) / r.height * H;
+  const m = coverMap(s);
+  const ix = (cx - m.ox) / m.sc, iy = (cy - m.oy) / m.sc;
+  s.panels[cal.panel].quad[cal.corner] = [Math.round(ix), Math.round(iy)];
+  cal.corner++;
+  if (cal.corner === 4) { cal.corner = 0; cal.panel++; }
+  if (cal.panel >= s.panels.length) {
+    overrides[s.id] = s.panels.map(p => p.quad);
+    localStorage.setItem(LS_KEY, JSON.stringify(overrides));
+    cal = null; calBox.className = "";
+    status(s.label + " panels tuned and saved.");
+  } else calPrompt();
+});
+
+/* ═════════ video scene: green-screen clip, keyed + tracked every frame ═════════ */
+const VFIX_KEY = "bikead-mockup-vfix-orbit-v2";   /* bumped per clip — old fixes don't carry over */
+const vplay = document.getElementById("vplay");
+const vseek = document.getElementById("vseek");
+const overlayEl = document.getElementById("overlay");
+let vSeekDrag = false;
+
+(function initVideoScene() {
+  const v = document.createElement("video");
+  v.muted = true; v.loop = true; v.playsInline = true;
+  v.setAttribute("playsinline", ""); v.setAttribute("webkit-playsinline", "");
+  v.style.cssText = "position:fixed;width:2px;height:2px;opacity:0;pointer-events:none;top:0;left:0;";
+  v.onloadeddata = () => {
+    vscene.ready = true;
+    vscene.iw = v.videoWidth; vscene.ih = v.videoHeight;
+    vscene.tex = tex(gl.LINEAR);
+    try { vscene.fixes = JSON.parse(localStorage.getItem(VFIX_KEY) || "[]"); } catch (e) { vscene.fixes = []; }
+    document.getElementById("vfixn").textContent = vscene.fixes.length;
+    drawMarks();
+    v.play().catch(() => {});
+    makeTabs();
+  };
+  v.onseeked = () => { vscene.seekDirty = true; };
+  document.body.appendChild(v);
+  /* fetch → blob: the python dev server can't do HTTP ranges, and
+     mp4 seeking (the scrubber) needs them — blob urls always seek */
+  fetch("scenes/orbit.mp4")
+    .then(r => { if (!r.ok) throw 0; return r.blob(); })
+    .then(b => { v.src = URL.createObjectURL(b); })
+    .catch(() => {});          /* no clip present — tool works without it */
+  vscene.video = v;
+})();
+
+/* per-frame green detection (downsampled), with a fold-split so two
+   joined faces of the box become two separately-warped panels */
+const det = document.createElement("canvas");
+const detW = 240;
+const dctx = det.getContext("2d", { willReadFrequently: true });
+
+/* shared detector: works on a still <img> or the current video frame */
+function detectPanels(src, iw, ih) {
+  const detH = Math.round(detW * ih / iw);
+  if (det.width !== detW || det.height !== detH) { det.width = detW; det.height = detH; }
+  dctx.drawImage(src, 0, 0, detW, detH);
+  const d = dctx.getImageData(0, 0, detW, detH).data;
+  const N = detW * detH;
+  const mask = new Uint8Array(N);
+  for (let i = 0; i < N; i++) {
+    const r = d[i*4], g = d[i*4+1], b = d[i*4+2];
+    /* saturated green OR pale washed-out green at grazing angles */
+    if ((g > 70 && g > 1.45 * r && g > 1.45 * b) ||
+        (g > 140 && g > r + 16 && g > b + 16)) mask[i] = 1;
+  }
+  const seen = new Uint8Array(N);
+  const blobs = [];
+  for (let i = 0; i < N; i++) {
+    if (!mask[i] || seen[i]) continue;
+    const stack = [i], px = [];
+    seen[i] = 1;
+    while (stack.length) {
+      const j = stack.pop(); px.push(j);
+      const jx = j % detW, jy = (j / detW) | 0;
+      if (jx > 0        && mask[j-1]    && !seen[j-1])    { seen[j-1] = 1;    stack.push(j-1); }
+      if (jx < detW-1   && mask[j+1]    && !seen[j+1])    { seen[j+1] = 1;    stack.push(j+1); }
+      if (jy > 0        && mask[j-detW] && !seen[j-detW]) { seen[j-detW] = 1; stack.push(j-detW); }
+      if (jy < detH-1   && mask[j+detW] && !seen[j+detW]) { seen[j+detW] = 1; stack.push(j+detW); }
+    }
+    if (px.length > N * 0.015) blobs.push(px);   /* ignores small green (mirror glints) */
+  }
+  const quads = [];
+  const sx = iw / detW, sy = ih / detH;
+  blobs.forEach(px => {
+    /* fold-split: two joined faces differ in brightness — find the step */
+    let minX = 1e9, maxX = -1e9;
+    px.forEach(j => { const x = j % detW; if (x < minX) minX = x; if (x > maxX) maxX = x; });
+    const w = maxX - minX + 1;
+    const colSum = new Float32Array(w), colN = new Float32Array(w);
+    const colTop = new Float32Array(w).fill(1e9);
+    px.forEach(j => {
+      const x = (j % detW) - minX, y = (j / detW) | 0;
+      colSum[x] += d[j*4+1]; colN[x]++;
+      if (y < colTop[x]) colTop[x] = y;
+    });
+    /* fold cue 1: brightness step between the two faces */
+    let split = -1, best = 0;
+    for (let x = Math.max(2, Math.round(w*0.22)); x < w*0.78; x++) {
+      const a = (colSum[x-2]/(colN[x-2]||1) + colSum[x-1]/(colN[x-1]||1)) / 2;
+      const b = (colSum[x+1]/(colN[x+1]||1) + colSum[x+2]/(colN[x+2]||1)) / 2;
+      const step = Math.abs(a - b) / Math.max(a, b, 1);
+      if (step > 0.16 && step > best) { best = step; split = x + minX; }
+    }
+    /* fold cue 2 (lighting-independent): a corner-on box has a
+       roof-shaped top edge — the fold column is the blob's peak */
+    if (split < 0 && w > 8) {
+      let peakY = 1e9;
+      for (let x = Math.round(w*0.18); x < w*0.82; x++) {
+        if (colN[x] && colTop[x] < peakY) peakY = colTop[x];
+      }
+      /* fold = centre of the top-edge plateau (roof ridge) */
+      let p0 = -1, p1 = -1;
+      for (let x = Math.round(w*0.18); x < w*0.82; x++) {
+        if (colN[x] && colTop[x] <= peakY + 1) { if (p0 < 0) p0 = x; p1 = x; }
+      }
+      const ends = Math.min(colTop[Math.round(w*0.06)] || 1e9, colTop[w - 1 - Math.round(w*0.06)] || 1e9);
+      if (p0 > 0 && peakY < ends - det.height * 0.011) split = Math.round((p0 + p1) / 2) + minX;
+    }
+    const groups = split > 0
+      ? [px.filter(j => (j % detW) <= split), px.filter(j => (j % detW) > split)]
+      : [px];
+    groups.forEach(g2 => {
+      if (g2.length < N * 0.008) return;
+      let tl, tr, br, bl, mins = 1e9, maxs = -1e9, mind = 1e9, maxd = -1e9;
+      g2.forEach(j => {
+        const x = j % detW, y = (j / detW) | 0, s = x + y, dd = x - y;
+        if (s < mins)  { mins = s; tl = [x, y]; }
+        if (s > maxs)  { maxs = s; br = [x, y]; }
+        if (dd > maxd) { maxd = dd; tr = [x, y]; }
+        if (dd < mind) { mind = dd; bl = [x, y]; }
+      });
+      /* inflate ~4% about the centroid: the downsampled blob under-reaches
+         the true green edge; the per-pixel chroma mask trims the overshoot */
+      const corners = [tl, tr, br, bl].map(([x, y]) => [x * sx, y * sy]);
+      const cx = corners.reduce((a, p) => a + p[0], 0) / 4;
+      const cy = corners.reduce((a, p) => a + p[1], 0) / 4;
+      quads.push(corners.map(([x, y]) => [cx + (x - cx) * 1.05, cy + (y - cy) * 1.05]));
+    });
+  });
+  quads.sort((a, b) => a[0][0] - b[0][0]);
+  return quads;
+}
+
+function detectQuads() {
+  const quads = detectPanels(vscene.video, vscene.iw, vscene.ih);
+  /* temporal smoothing kills tracking jitter */
+  if (vscene.quads.length === quads.length) {
+    quads.forEach((q, i) => q.forEach((p, k) => {
+      const o = vscene.quads[i][k];
+      if (Math.hypot(p[0]-o[0], p[1]-o[1]) < vscene.iw * 0.06) {
+        p[0] = o[0] + (p[0] - o[0]) * 0.45;
+        p[1] = o[1] + (p[1] - o[1]) * 0.45;
+      }
+    }));
+  }
+  vscene.quads = quads;
+}
+
+/* manual fixes: saved at a timestamp, blended in around it (±0.5s) */
+function applyFixes(t) {
+  vscene.fixes.forEach(f => {
+    const w = Math.max(0, 1 - Math.abs(t - f.t) / 0.5);
+    if (w <= 0) return;
+    if (f.quads.length === vscene.quads.length) {
+      vscene.quads.forEach((q, i) => q.forEach((p, k) => {
+        p[0] += (f.quads[i][k][0] - p[0]) * w;
+        p[1] += (f.quads[i][k][1] - p[1]) * w;
+      }));
+    } else if (w > 0.5) {
+      vscene.quads = f.quads.map(q => q.map(p => [p[0], p[1]]));
+    }
+  });
+}
+
+/* slide-by-slide stepping: the clip divided into 0.5s slides — one
+   fix per slide chains into continuous manual tracking (fixes blend ±0.5s) */
+const SLIDE = 0.5;
+function slideCount() {
+  const d = vscene.ready ? vscene.video.duration : 0;
+  return d ? Math.floor((d - 0.05) / SLIDE) + 1 : 0;
+}
+function curSlide() {
+  return Math.round(vscene.video.currentTime / SLIDE);
+}
+function gotoSlide(i) {
+  if (!vscene.ready) return;
+  const v = vscene.video;
+  v.pause();
+  vscene.edited = false;
+  const max = slideCount() - 1;
+  const t = Math.min(Math.max(0, i), max) * SLIDE;
+  v.currentTime = Math.min(t, v.duration - 0.05);
+}
+document.getElementById("vprev").onclick = () => gotoSlide(curSlide() - 1);
+document.getElementById("vnext").onclick = () => gotoSlide(curSlide() + 1);
+addEventListener("keydown", e => {
+  if (mode !== "video" || !vscene.ready) return;
+  if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+  if (e.key === "ArrowLeft")  { e.preventDefault(); gotoSlide(curSlide() - 1); }
+  if (e.key === "ArrowRight") { e.preventDefault(); gotoSlide(curSlide() + 1); }
+});
+
+/* transport */
+vplay.onclick = () => {
+  const v = vscene.video;
+  if (!vscene.ready) return;
+  if (v.paused) { vscene.edited = false; v.play().catch(() => {}); } else v.pause();
+};
+vseek.addEventListener("pointerdown", () => vSeekDrag = true);
+vseek.addEventListener("pointerup", () => vSeekDrag = false);
+vseek.oninput = () => {
+  const v = vscene.video;
+  if (!vscene.ready || !v.duration) return;
+  v.pause();
+  vscene.edited = false;
+  v.currentTime = vseek.value / 100 * v.duration;
+};
+document.getElementById("vfix").onclick = () => {
+  if (mode !== "video" || !vscene.ready || !vscene.quads.length) return;
+  const t = vscene.video.currentTime;
+  vscene.fixes = vscene.fixes.filter(f => Math.abs(f.t - t) > 0.25);
+  vscene.fixes.push({ t, quads: vscene.quads.map(q => q.map(p => [p[0], p[1]])) });
+  vscene.fixes.sort((a, b) => a.t - b.t);
+  localStorage.setItem(VFIX_KEY, JSON.stringify(vscene.fixes));
+  document.getElementById("vfixn").textContent = vscene.fixes.length;
+  drawMarks();
+  vscene.edited = false;
+  const s = curSlide();
+  if (vscene.video.paused && s < slideCount() - 1) {
+    gotoSlide(s + 1);
+    status("Fix saved at " + t.toFixed(2) + "s — moved to slide " + (s + 2) + "/" + slideCount() + ".");
+  } else {
+    status("Corner fix saved at " + t.toFixed(2) + "s.");
+  }
+};
+document.getElementById("vclear").onclick = () => {
+  vscene.fixes = [];
+  localStorage.removeItem(VFIX_KEY);
+  document.getElementById("vfixn").textContent = 0;
+  drawMarks();
+  status("All corner fixes cleared.");
+};
+
+/* magnifier loupe while dragging a corner (3× zoom of the live canvas) */
+const loupeEl = document.getElementById("loupe");
+const loupeCtx = loupeEl.querySelector("canvas").getContext("2d");
+function drawLoupe(clientX, clientY, bx, by, rect) {
+  const s = 50 * (W / rect.width);              /* 50 css px of canvas, 3× into 150 */
+  loupeCtx.fillStyle = "#000";
+  loupeCtx.fillRect(0, 0, 150, 150);
+  loupeCtx.drawImage(view, bx - s / 2, by - s / 2, s, s, 0, 0, 150, 150);
+  loupeEl.style.display = "block";
+  const lx = Math.min(innerWidth - 160, Math.max(10, clientX + 26));
+  const ly = clientY - 170 < 10 ? clientY + 26 : clientY - 170;
+  loupeEl.style.left = lx + "px";
+  loupeEl.style.top = ly + "px";
+}
+
+/* panel controls while paused: split a merged quad, add, remove */
+const vpanelsEl = document.getElementById("vpanels");
+document.getElementById("vsplit").onclick = () => {
+  if (!vscene.quads.length) return;
+  /* split the widest quad vertically at its midline */
+  let wi = 0, wbest = -1;
+  vscene.quads.forEach((q, i) => {
+    const w = Math.abs(q[1][0] - q[0][0]) + Math.abs(q[2][0] - q[3][0]);
+    if (w > wbest) { wbest = w; wi = i; }
+  });
+  const q = vscene.quads[wi];
+  const mt = [(q[0][0] + q[1][0]) / 2, (q[0][1] + q[1][1]) / 2];
+  const mb = [(q[3][0] + q[2][0]) / 2, (q[3][1] + q[2][1]) / 2];
+  vscene.quads.splice(wi, 1,
+    [q[0], mt, mb, q[3]].map(p => [p[0], p[1]]),
+    [mt, q[1], q[2], mb].map(p => [p[0], p[1]]));
+  vscene.edited = true;
+  status("Panel split in two — drag the corners onto each face, then save the fix.");
+};
+document.getElementById("vadd").onclick = () => {
+  const w = vscene.iw, h = vscene.ih;
+  vscene.quads.push([[w*0.4, h*0.4], [w*0.6, h*0.4], [w*0.6, h*0.6], [w*0.4, h*0.6]]);
+  vscene.edited = true;
+  status("Panel added at centre — drag it into place, then save the fix.");
+};
+document.getElementById("vdel").onclick = () => {
+  if (!vscene.quads.length) return;
+  vscene.quads.pop();
+  vscene.edited = true;
+  status("Last panel removed.");
+};
+
+/* fix markers on the scrubber */
+function drawMarks() {
+  const el = document.getElementById("vmarks");
+  const d = vscene.ready ? vscene.video.duration : 0;
+  el.innerHTML = "";
+  if (!d) return;
+  vscene.fixes.forEach(f => {
+    const i = document.createElement("i");
+    i.style.left = (f.t / d * 100) + "%";
+    el.appendChild(i);
+  });
+}
+
+/* draggable corner handles while paused */
+function updateHandles() {
+  const v = vscene.video;
+  if (!v || !v.paused) { if (overlayEl.childNodes.length) overlayEl.innerHTML = ""; return; }
+  const m = coverMap(vscene);
+  const rect = view.getBoundingClientRect();
+  const need = vscene.quads.length * 4;
+  while (overlayEl.childNodes.length < need) {
+    const h = document.createElement("div");
+    h.className = "handle";
+    const idx = overlayEl.childNodes.length;
+    h.addEventListener("pointerdown", e => {
+      e.preventDefault();
+      const move = ev => {
+        const r2 = view.getBoundingClientRect();
+        const cx = (ev.clientX - r2.left) / r2.width * W;
+        const cy = (ev.clientY - r2.top) / r2.height * H;
+        const q = Math.floor(idx / 4), k = idx % 4;
+        if (!vscene.quads[q]) return;
+        const mm = coverMap(vscene);
+        vscene.quads[q][k] = [(cx - mm.ox) / mm.sc, (cy - mm.oy) / mm.sc];
+        vscene.edited = true;
+        drawLoupe(ev.clientX, ev.clientY, cx, cy, r2);
+      };
+      const up = () => {
+        removeEventListener("pointermove", move);
+        removeEventListener("pointerup", up);
+        loupeEl.style.display = "none";
+      };
+      addEventListener("pointermove", move);
+      addEventListener("pointerup", up);
+    });
+    overlayEl.appendChild(h);
+  }
+  while (overlayEl.childNodes.length > need) overlayEl.lastChild.remove();
+  vscene.quads.forEach((q, i) => q.forEach((p, k) => {
+    const h = overlayEl.childNodes[i * 4 + k];
+    h.style.left = (p[0] * m.sc + m.ox) / W * rect.width + "px";
+    h.style.top  = (p[1] * m.sc + m.oy) / H * rect.height + "px";
+  }));
+}
+
+/* ═════════ test hooks ═════════ */
+window.__mock = {
+  loadAdFromUrl, scenes: SCENES, vscene, setScene: id => { mode = id; makeTabs(); },
+  record: () => recBtn.click(), pdf: () => pdfBtn.click(),
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bike Ad — Your Brand On The Move</title>
+<meta name="description" content="LED billboard advertising on delivery motorbikes. Your ad, looping across the city, every day.">
+<!-- social share preview — set og:image/og:url to absolute URLs once the domain is live -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bike Ad — Your Brand On The Move">
+<meta property="og:description" content="Triple-sided LED billboards on delivery motorbikes across Cairo. 3,600,000 monthly impressions at eye level.">
+<meta property="og:image" content="assets/poster.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,600;0,800;0,900;1,900&family=Cairo:wght@400;600;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="preload" as="image" href="assets/scrub/frame_000.jpg">
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%23050505"/><rect x="18" y="26" width="64" height="48" rx="8" fill="none" stroke="%23FF4F1F" stroke-width="7"/><circle cx="34" cy="86" r="9" fill="%23FF4F1F"/><circle cx="66" cy="86" r="9" fill="%23FF4F1F"/></svg>'>
+</head>
+<body>
+
+<a class="skip-link" href="#hero" data-i18n="a11y.skip">Skip to content</a>
+
+<!-- ══════════════ PRELOADER ══════════════ -->
+<div class="preloader" id="preloader">
+  <div class="preloader-screen">
+    <div class="led-dots"></div>
+    <span class="preloader-text" data-i18n="loader">BIKE AD</span>
+  </div>
+  <div class="preloader-bar"><i></i></div>
+</div>
+
+<!-- ══════════════ CUSTOM CURSOR ══════════════ -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ══════════════ NAV ══════════════ -->
+<header class="nav" id="nav">
+  <a class="nav-logo" href="#top" aria-label="Bike Ad home">
+    <img class="nav-logo-mark" src="assets/logo.png" alt="" width="200" height="200">
+    <span>Bike&nbsp;Ad</span>
+  </a>
+  <nav class="nav-links">
+    <a href="#how" data-i18n="nav.how">How it works</a>
+    <a href="#reach" data-i18n="nav.reach">Reach</a>
+    <a href="#coverage" data-i18n="nav.coverage">Coverage</a>
+    <a href="#pricing" data-i18n="nav.pricing">Pricing</a>
+  </nav>
+  <div class="nav-actions">
+    <button class="lang-toggle" id="langToggle" aria-label="Switch language"><span>عربي</span></button>
+    <a class="btn btn-solid nav-cta" href="#contact" data-i18n="nav.cta">Book your ad</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ══════════════ OPENING SCRUB (first 2s of the promo, scroll-driven) ══════════════ -->
+  <section class="scrub" id="scrub">
+    <div class="scrub-sticky">
+      <canvas id="scrubCanvas" aria-hidden="true"></canvas>
+      <div class="scrub-shade" aria-hidden="true"></div>
+      <h2 class="scrub-line scrub-line-1" id="scrubLine1"><span data-i18n="scrub.l1">Ads that chase</span></h2>
+      <h2 class="scrub-line scrub-line-2" id="scrubLine2"><span data-i18n="scrub.l2">Ads that are unavoidable</span></h2>
+      <div class="scroll-hint scrub-hint" id="scrubHint" aria-hidden="true"><span data-i18n="hero.scroll">scroll</span><i></i></div>
+    </div>
+  </section>
+
+  <!-- ══════════════ STATEMENT RIDE (pinned: sentence → bike rides up → sentence) ══════════════ -->
+  <section class="ride" id="why">
+    <div class="ride-sticky">
+      <div class="ride-speedlines" id="rideSpeed" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="ride-bike" id="rideBike" aria-hidden="true">
+        <img src="assets/bike-rear.jpg" alt="" width="1025" height="1162" loading="lazy" decoding="async">
+        <canvas id="orbitCanvas"></canvas>
+        <div class="ride-glow"></div>
+      </div>
+      <p class="statement ride-s1" id="rideS1">
+        <span data-i18n="st.s1a">Bike Ad turns everyday streets into </span><em data-i18n="st.s1b">high-impact OOH media.</em>
+      </p>
+      <p class="statement ride-s2" id="rideS2">
+        <span data-i18n="st.s2a">Triple-sided LED panels on motorbikes put your message </span><em data-i18n="st.s2b">at eye level</em><span data-i18n="st.s2c"> — compared to all other forms of advertising.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section class="hero" id="hero" tabindex="-1">
+    <div class="hero-noise"></div>
+    <div class="hero-glow"></div>
+
+    <div class="hero-inner">
+      <p class="hero-kicker reveal" data-i18n="hero.kicker">Moving LED billboards · Cairo</p>
+      <h1 class="hero-title">
+        <span class="line"><span data-i18n="hero.l1">YOUR BRAND</span></span>
+        <span class="line accent"><span data-i18n="hero.l2">ON THE MOVE</span></span>
+      </h1>
+      <p class="hero-sub reveal" data-i18n="hero.sub">
+        Bright LED screens mounted on delivery motorbikes, looping your ad
+        through the busiest streets — traffic jams become your audience.
+      </p>
+      <div class="hero-ctas reveal">
+        <a class="btn btn-solid btn-lg" href="#contact" data-i18n="hero.cta1">Put my ad on a bike</a>
+        <a class="btn btn-ghost btn-lg" href="#how" data-i18n="hero.cta2">How it works ↓</a>
+      </div>
+    </div>
+
+    <div class="scroll-hint" aria-hidden="true"><span data-i18n="hero.scroll">scroll</span><i></i></div>
+  </section>
+
+  <!-- ══════════════ HOW IT WORKS ══════════════ -->
+  <section class="section how" id="how">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2 data-i18n="how.title">How it works</h2>
+      <p data-i18n="how.sub">From your artwork to the streets in 48 hours.</p>
+    </div>
+    <ol class="steps">
+      <li class="step reveal">
+        <div class="step-icon">
+          <svg viewBox="0 0 48 48"><rect x="8" y="10" width="32" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M14 28l7-8 6 6 4-4 3 6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="18" cy="17" r="2.4" fill="currentColor"/><path d="M20 38h8" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </div>
+        <h3 data-i18n="how.s1t">Send your ad</h3>
+        <p data-i18n="how.s1p">Send us your design — or we create one for you. Static image or short animation, sized for the LED screen.</p>
+      </li>
+      <li class="step reveal">
+        <div class="step-icon">
+          <svg viewBox="0 0 48 48"><rect x="10" y="8" width="28" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M24 28v6M14 40h20M17 34l-3 6M31 34l3 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M17 15h6M17 20h10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </div>
+        <h3 data-i18n="how.s2t">We load the loop</h3>
+        <p data-i18n="how.s2p">Your ad joins the rotation on our bike-mounted LED screens, switching every few seconds with a limited number of slots.</p>
+      </li>
+      <li class="step reveal">
+        <div class="step-icon">
+          <img src="assets/logo.png" alt="" width="200" height="200">
+        </div>
+        <h3 data-i18n="how.s3t">Bikes hit the streets</h3>
+        <p data-i18n="how.s3p">Delivery riders cover the city all day — main roads, bridges, squares — your ad glowing at eye level in traffic.</p>
+      </li>
+      <li class="step reveal">
+        <div class="step-icon">
+          <svg viewBox="0 0 48 48"><path d="M8 40V20M20 40V12M32 40V26M44 40V8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="44" cy="8" r="3.5" fill="currentColor"/></svg>
+        </div>
+        <h3 data-i18n="how.s4t">You get the report</h3>
+        <p data-i18n="how.s4p">Every summary is published on the Bike Ad app: routes covered, hours on the road, and estimated impressions for your campaign.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ══════════════ STATS / REACH ══════════════ -->
+  <section class="section reach" id="reach">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2 data-i18n="reach.title">Reach that rides everywhere</h2>
+    </div>
+    <div class="stats">
+      <div class="stat reveal">
+        <span class="stat-num" data-count="10">0</span>
+        <span class="stat-label" data-i18n="reach.bikes">bikes on the road</span>
+      </div>
+      <div class="stat reveal">
+        <span class="stat-num" data-count="3600000">0</span>
+        <span class="stat-label" data-i18n="reach.impressions">monthly impressions</span>
+      </div>
+      <div class="stat reveal">
+        <span class="stat-num" data-count="12" data-suffix="h">0</span>
+        <span class="stat-label" data-i18n="reach.hours">on the street, every day</span>
+      </div>
+      <div class="stat reveal">
+        <span class="stat-num" data-count="200" data-suffix="km">0</span>
+        <span class="stat-label" data-i18n="reach.km">covered per bike, daily</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ VIDEO ══════════════ -->
+  <section class="section video-sec" id="video">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2 data-i18n="video.title">Watch it in action</h2>
+    </div>
+    <div class="video-frame reveal" id="videoFrame">
+      <div class="video-bezel">
+        <video id="promoVideo" src="assets/hero.mp4" poster="assets/poster.png" playsinline preload="metadata"></video>
+        <div class="led-overlay video-led"></div>
+        <button class="video-play" id="videoPlay" aria-label="Play video">
+          <svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="23" fill="none" stroke="currentColor" stroke-width="2"/><path d="M19 15l14 9-14 9z" fill="currentColor"/></svg>
+          <span data-i18n="video.play">Play the promo</span>
+        </button>
+      </div>
+      <div class="video-legs" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════ COVERAGE ══════════════ -->
+  <section class="section coverage" id="coverage">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2 data-i18n="cov.title">Where the bikes ride</h2>
+      <p data-i18n="cov.sub">Routes are optimized according to traffic data, ensuring bikes hit the busiest streets at the busiest hours.</p>
+    </div>
+    <div class="coverage-grid">
+      <div class="coverage-map reveal" aria-hidden="true">
+        <svg viewBox="0 0 400 300" id="covMap">
+          <path class="cov-route r1" d="M30 250 C 90 210, 120 220, 160 170 S 260 90, 370 60"/>
+          <path class="cov-route r2" d="M20 120 C 100 130, 150 160, 210 160 S 330 190, 385 230"/>
+          <path class="cov-route r3" d="M60 30 C 90 90, 140 110, 200 120 S 300 140, 350 260"/>
+          <circle class="cov-dot d1" r="6"/>
+          <circle class="cov-dot d2" r="6"/>
+          <circle class="cov-dot d3" r="6"/>
+        </svg>
+      </div>
+      <ul class="coverage-list" id="covList">
+        <li class="reveal"><span data-i18n="cov.a1">Nasr City</span></li>
+        <li class="reveal"><span data-i18n="cov.a2">Heliopolis</span></li>
+        <li class="reveal"><span data-i18n="cov.a3">Downtown</span></li>
+        <li class="reveal"><span data-i18n="cov.a4">Zamalek</span></li>
+        <li class="reveal"><span data-i18n="cov.a5">Maadi</span></li>
+        <li class="reveal"><span data-i18n="cov.a6">6th of October</span></li>
+        <li class="reveal"><span data-i18n="cov.a7">New Cairo</span></li>
+        <li class="reveal more"><span data-i18n="cov.more">+ your area on request</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══════════════ PARTNERS ══════════════ -->
+  <section class="section partners" id="partners">
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <h2 data-i18n="partners.title">Our partners</h2>
+    </div>
+    <div class="partners-grid">
+      <div class="partner reveal"><img src="assets/partners/hyrmas.png" alt="Hyrmas" loading="lazy" decoding="async"></div>
+      <div class="partner reveal"><img src="assets/partners/maqtora.png" alt="Maqtora" loading="lazy" decoding="async"></div>
+      <div class="partner reveal"><img src="assets/partners/abaza.png" alt="Abaza Boats" loading="lazy" decoding="async"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════ PRICING ══════════════ -->
+  <section class="section pricing" id="pricing">
+    <div class="section-head">
+      <span class="section-num">06</span>
+      <h2 data-i18n="price.title">Simple packages</h2>
+      <p data-i18n="price.sub">Two ways to ride — a ready-to-go package, or a fully custom chase.</p>
+    </div>
+    <div class="plans">
+      <article class="plan featured reveal">
+        <span class="plan-badge" data-i18n="price.popular">Most popular</span>
+        <h3 data-i18n="price.p1t">City Mover</h3>
+        <p class="plan-desc" data-i18n="price.p1d">Serious visibility</p>
+        <div class="plan-price"><span class="cur" data-i18n="price.egp">EGP</span><span class="amount">100,000</span><span class="per" data-i18n="price.week">/week</span></div>
+        <ul>
+          <li data-i18n="price.p1f1">10 bikes</li>
+          <li data-i18n="price.p1f2">3,600,000 monthly impressions</li>
+          <li data-i18n="price.p1f3">1 ad slot in the loop, repeating every 60 seconds</li>
+          <li data-i18n="price.p1f4">Priority high-traffic routes</li>
+          <li data-i18n="price.p1f5">Route tracking + weekly impressions report on the Bike Ad app</li>
+        </ul>
+        <a href="#contact" class="btn btn-solid" data-i18n="price.cta">Get a quote</a>
+      </article>
+      <article class="plan reveal">
+        <h3 data-i18n="price.p2t">CHASE</h3>
+        <p class="plan-desc" data-i18n="price.p2d">Hyper-targeted, fully custom</p>
+        <div class="plan-price"><span class="amount amount-word" data-i18n="price.custom">Custom</span></div>
+        <ul>
+          <li data-i18n="price.p2f1">Custom number of bikes</li>
+          <li data-i18n="price.p2f2">Your own exclusive ad loop</li>
+          <li data-i18n="price.p2f3">Hyper-targeted routes that chase your customer base</li>
+          <li data-i18n="price.p2f4">Product giveaways in hotspots — schools, workplaces & more</li>
+          <li data-i18n="price.p2f5">Daily summary report, published on the Bike Ad app</li>
+        </ul>
+        <a href="#contact" class="btn btn-ghost" data-i18n="price.cta">Get a quote</a>
+      </article>
+    </div>
+  </section>
+
+  <!-- ══════════════ CTA / CONTACT ══════════════ -->
+  <section class="section contact" id="contact">
+    <div class="contact-screen reveal">
+      <div class="led-overlay"></div>
+      <h2 class="contact-title"><span data-i18n="contact.title">Ready to ride?</span></h2>
+      <p data-i18n="contact.sub">Message us on WhatsApp — send your logo and we'll reply with a mockup of your ad on the bike screen, free.</p>
+      <a class="btn btn-solid btn-lg wa-btn" id="waMain" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.6.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.4-3c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.2-.3.3-.5v-.5c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s1 2.5 1.1 2.7c.1.2 1.9 3 4.7 4.2.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2l-.4-.3z"/></svg>
+        <span data-i18n="contact.btn">Chat on WhatsApp</span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="footer">
+  <div class="footer-bike" aria-hidden="true">
+    <img src="assets/bike-footer.jpg" alt="" width="315" height="289" decoding="async">
+  </div>
+  <p>© <span id="year"></span> Bike Ad · <span data-i18n="footer.tag">Ads that never sit still.</span></p>
+</footer>
+
+<!-- floating whatsapp -->
+<a class="wa-float" id="waFloat" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.6.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.4-3c-.3-.4 0-.5.1-.7l.4-.5c.1-.2.2-.3.3-.5v-.5c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s1 2.5 1.1 2.7c.1.2 1.9 3 4.7 4.2.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2l-.4-.3z"/></svg>
+</a>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
